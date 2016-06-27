@@ -1,0 +1,72 @@
+One.    Installing new version of Open vSwitch
+
+1.Remove old packages:
+root@mininet-vm# apt-get remove openvswitch-common openvswitch-datapath-dkms openvswitch-controller openvswitch-pki openvswitch-switch
+
+2.Download and unpack OpenVSwitch 1.10:
+root@mininet-vm# wget http://openvswitch.org/releases/openvswitch-2.3.3.tar.gz
+root@mininet-vm# tar zxvf openvswitch-1.10.0.tar.gz
+
+3.Build and install option 1 (Binary build and install):
+root@mininet-vm# cd openvswitch-1.10.0/
+root@mininet-vm# ./configure --prefix=/usr --with-linux=/lib/modules/`uname -r`/build
+root@mininet-vm# make
+root@mininet-vm# make install
+root@mininet-vm# make modules_install
+root@mininet-vm# rmmod openvswitch
+root@mininet-vm# depmod -a
+
+4.Then do some post install steps to keep the Open vSwitch Controller from starting automatically on boot:
+root@mininet-vm# /etc/init.d/openvswitch-controller stop
+root@mininet-vm# update-rc.d openvswitch-controller disable
+
+5.Start OVS server process:
+root@mininet-vm# /etc/init.d/openvswitch-switch start
+
+
+TWO.    Installing Open	vSwitch
+1.apt-get install build-essential
+apt-get install autoconf automake libssl-dev openssl python2.7 GCC libtool perl make Clang libc-dev
+
+2../boot.sh
+
+3../configure --with-linux=/lib/modules/`uname -r`/build
+
+4. make
+
+5.make install
+
+6.make modules_install
+/sbin/modprobe openvswitch
+
+8. Initialize the configuration database using ovsdb-tool, e.g.:
+
+      % mkdir -p /usr/local/etc/openvswitch
+      % ovsdb-tool create /usr/local/etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
+
+Before starting ovs-vswitchd itself, you need to start its
+configuration database, ovsdb-server.  Each machine on which Open
+vSwitch is installed should run its own copy of ovsdb-server.
+Configure it to use the database you created during installation (as
+explained above), to listen on a Unix domain socket, to connect to any
+managers specified in the database itself, and to use the SSL
+configuration in the database:
+
+      % ovsdb-server --remote=punix:/usr/local/var/run/openvswitch/db.sock \
+                     --remote=db:Open_vSwitch,Open_vSwitch,manager_options \
+                     --private-key=db:Open_vSwitch,SSL,private_key \
+                     --certificate=db:Open_vSwitch,SSL,certificate \
+                     --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert \
+                     --pidfile --detach
+
+Then initialize the database using ovs-vsctl.  This is only
+necessary the first time after you create the database with
+ovsdb-tool (but running it at any time is harmless):
+
+      % ovs-vsctl --no-wait init
+
+Then start the main Open vSwitch daemon, telling it to connect to the
+same Unix domain socket:
+
+      % ovs-vswitchd --pidfile --detach
+

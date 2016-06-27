@@ -1,0 +1,9 @@
+把虚拟机关机
+escli vm process list #显示在此ESXI服务器中所运行的虚拟机列表
+esxcli vm process kill --type=[soft,hard,force] --world-id=WorldNumber
+
+第二种方法
+vim-cmd vmsvc/getallvms
+vim-cmd vmsvc/power.shutdown VMID
+或者
+vim-cmd vmsvc/power.off VMID

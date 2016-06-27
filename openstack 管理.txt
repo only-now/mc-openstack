@@ -1,0 +1,4 @@
+swift ·şÎñÖØÆô
+swift-init proxy start
+swift-init all start
+swift-init main start

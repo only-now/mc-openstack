@@ -1,0 +1,28 @@
+更新系统时间
+ntpdate  ntp-server-ip
+
+建立定时任务，每30分钟同步一次
+echo '*/30 * * * * root /usr/sbin/ntpdate 10.191.131.131' >> /etc/crontab
+
+重启定时执行任务服务
+service cron restart
+
+1）crontab -u // 设定某个用户的cron服务
+2）crontab -l // 列出某个用户cron服务的详细内容
+3）crontab -r // 删除没个用户的cron服务
+4）crontab -e // 编辑某个用户的cron服务
+
+/var/spool/cron/ 该目录下存放所有用户的cron服务
+/var/log/cron 记录cron运行的日志信息
+
+# crontab -e
+1）直接执行命令行
+每2分钟打印一个字符串“Hello World”，保存至文件/home/laigw/cron/HelloWorld.txt中，cron 格式如下：
+*/2 * * * * echo “Hello World.” >> /home/HelloWorld.txt
+2）shell 文件
+每3分钟调用一次 /home/laigw/cron/test.sh 文件，cron 格式如下：
+*/3 * * * * /home/laigw/cron/test.sh
+
+将系统时间写入硬件时间
+
+# hwclock --systohc
